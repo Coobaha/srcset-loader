@@ -52,7 +52,7 @@ function stringifySources(sources) {
 
 function stringifySrcSet(sources) {
   return Object.keys(sources).map((size) => {
-    return `${sources[size]} + " ${size}"`;
+    return `${sources[size]} + " ${size}w"`;
   }).join('+","+');
 }
 
@@ -103,12 +103,16 @@ module.exports.pitch = function srcSetLoaderPitch(remainingRequest) {
   const sources = buildSources(sizes, loaders, resource);
   const exportSources = stringifySources(sources);
   const exportSrcSet = stringifySrcSet(sources);
+  const firstImage = Object.values(sources)[0];
+
   const placeholderScript = placeholder ? `placeholder: require('!!${path.join(__dirname, './placeholder')}!${resource}'),` : '';
-  return `
-module.exports = {
+  return `var src = ${firstImage};
+var ret = {
   sources: ${exportSources},
   srcSet: ${exportSrcSet},
+  src: src,
   ${placeholderScript}
 };
-`;
+Object.defineProperty(ret, 'toString', {enumerable: false, value: function(){return src}});
+module.exports = ret;`;
 };
