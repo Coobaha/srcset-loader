@@ -3,9 +3,10 @@ const DataUri = require('datauri');
 const sharp = require('sharp');
 const getPixels = require('get-pixels');
 
-function resizeImage(buffer, width) {
+function resizeImage(buffer) {
   return sharp(buffer)
-    .resize(width)
+    .resize(20, 20)
+    .min()
     .toBuffer();
 }
 
@@ -27,8 +28,8 @@ function getColor(buffer, size) {
   });
 }
 
-function createPlaceholder(content, width = 20) {
-  return resizeImage(content, width).then((resizedBuffer) => {
+function createPlaceholder(content) {
+  return resizeImage(content).then((resizedBuffer) => {
     const size = imageSize(resizedBuffer);
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size.width} ${size.height}">
       <filter id="x"><feGaussianBlur stdDeviation="1" /></filter>
